@@ -37,8 +37,16 @@ endif()
 # Otherwise, you can set OUTPUT_FOLDER to any place you'd like :)
 # set(OUTPUT_FOLDER "C:/path/to/any/folder")
 
+# Build CommonLibSSE-NG from the current source submodule. The submodule
+# provides both the CommonLib target and add_commonlibsse_plugin().
+set(BUILD_TESTS OFF CACHE BOOL "Disable CommonLibSSE-NG tests" FORCE)
+add_subdirectory(
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/commonlibsse-ng"
+    commonlibsse-ng
+    EXCLUDE_FROM_ALL
+)
+
 # Setup your SKSE plugin as an SKSE plugin!
-find_package(CommonLibSSE CONFIG REQUIRED)
 add_commonlibsse_plugin(${PROJECT_NAME} 
     SOURCES
     src/main.cpp
