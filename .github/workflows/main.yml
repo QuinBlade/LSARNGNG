@@ -42,8 +42,27 @@ jobs:
           VCPKG_ROOT: ${{ github.workspace }}\vcpkg
         run: cmake --build build/release
 
-      - name: Upload DLL
+      - name: Package MO2 override
+        shell: pwsh
+        run: |
+          $package = Join-Path $env:GITHUB_WORKSPACE "package"
+          $pluginDir = Join-Path $package "SKSE\Plugins"
+          $dll = Join-Path $env:GITHUB_WORKSPACE "build\release\LSARNG.dll"
+
+          if (!(Test-Path $dll)) {
+              throw "Build output was not found: $dll"
+          }
+
+          New-Item -ItemType Directory -Force -Path $pluginDir | Out-Null
+          Copy-Item -Force $dll (Join-Path $pluginDir "LSARNG.dll")
+
+          Write-Host "Prepared MO2 package directory: $package"
+          Get-ChildItem -Recurse $package | Select-Object FullName, Length
+
+      - name: Upload MO2 package
         uses: actions/upload-artifact@v4
         with:
-          name: LSARNG-1.7.104-build
-          path: build/release/LSARNG.dll
+          name: LSARNG-1.7.104-Override
+          # GitHub downloads this artifact as a ZIP with SKSE at its root,
+          # so the downloaded artifact can be installed directly by MO2.
+          path: package
